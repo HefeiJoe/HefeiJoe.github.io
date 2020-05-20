@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hefeijoe.github.io/</id>
     <title>HefeiJoe Blog</title>
-    <updated>2020-05-20T07:42:20.774Z</updated>
+    <updated>2020-05-20T08:16:49.058Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hefeijoe.github.io/"/>
     <link rel="self" href="https://hefeijoe.github.io/atom.xml"/>
@@ -11,12 +11,12 @@
     <icon>https://hefeijoe.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, HefeiJoe Blog</rights>
     <entry>
-        <title type="html"><![CDATA[Traefik V2.0.2基于Kubernetes的安装]]></title>
+        <title type="html"><![CDATA[Traefik V2.0.2基于Kubernetes的安装与使用]]></title>
         <id>https://hefeijoe.github.io/post/tekton-pilepine-install/</id>
         <link href="https://hefeijoe.github.io/post/tekton-pilepine-install/">
         </link>
         <updated>2020-05-20T07:05:06.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="核心概念">核心概念</h1>
+        <content type="html"><![CDATA[<h1 id="核心概念">核心概念😀</h1>
 <p>Traefik 是一个边缘路由器，是你整个平台的大门，拦截并路由每个传入的请求：它知道所有的逻辑和规则，这些规则确定哪些服务处理哪些请求；传统的反向代理需要一个配置文件，其中包含路由到你服务的所有可能路由，而 Traefik 会实时检测服务并自动更新路由规则，可以自动服务发现。<br>
 <img src="https://uploader.shimo.im/f/iyHnEdPIrUQBxeSd.png!thumbnail" alt="img" loading="lazy"><br>
 首先，当启动 Traefik 时，需要定义 entrypoints（入口点），然后，根据连接到这些 entrypoints 的路由来分析传入的请求，来查看他们是否与一组规则相匹配，如果匹配，则路由可能会将请求通过一系列中间件转换过后再转发到你的服务上去。在了解 Traefik 之前有几个核心概念我们必须要了解：</p>
@@ -27,7 +27,8 @@
 <li><strong>Services</strong> 将请求转发给你的应用（load balancing, …），负责配置如何获取最终将处理传入请求的实际服务。</li>
 <li><strong>Middlewares</strong> 中间件，用来修改请求或者根据请求来做出一些判断（authentication, rate limiting, headers, …），中间件被附件到路由上，是一种在请求发送到你的服务之前（或者在服务的响应发送到客户端之前）调整请求的一种方法。</li>
 </ul>
-<h1 id="部署">部署</h1>
+<h1 id="部署">部署😄</h1>
+<h2 id="kubernetes">Kubernetes</h2>
 <p>由于 Traefik 2.X 版本和之前的 1.X 版本不兼容，我们这里选择功能更加强大的 2.X 版本进行部署，我们这里使用的镜像是 traefik:2.0.2。<br>
 在 Traefik 中的配置可以使用两种不同的方式：</p>
 <ul>
@@ -42,183 +43,19 @@
 </ul>
 <h3 id="crd与rbac">CRD与RBAC</h3>
 <p>首先，定义CRD包括IngressRoute和Middleware。并且通过RBAC授权资源。<br>
-参见：http://advgitlab.eastasia.cloudapp.azure.com/WISE-PaaS-4.0-Ops/EnSaaS_DevOps_APIM/blob/master/example/traefik/traefik-crd.yaml<br>
+参见：https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-crd.yaml<br>
 <em>注：默认安装在<strong>default</strong>下</em></p>
-<pre><code>apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: ingressroutes.traefik.containo.us
-spec:
-  group: traefik.containo.us
-  version: v1alpha1
-  names:
-​    kind: IngressRoute
-​    plural: ingressroutes
-​    singular: ingressroute
-  scope: Namespaced
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: ingressroutetcps.traefik.containo.us
-spec:
-  group: traefik.containo.us
-  version: v1alpha1
-  names:
-​    kind: IngressRouteTCP
-​    plural: ingressroutetcps
-​    singular: ingressroutetcp
-  scope: Namespaced
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: middlewares.traefik.containo.us
-spec:
-  group: traefik.containo.us
-  version: v1alpha1
-  names:
-​    kind: Middleware
-​    plural: middlewares
-​    singular: middleware
-  scope: Namespaced
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: tlsoptions.traefik.containo.us
-spec:
-  group: traefik.containo.us
-  version: v1alpha1
-  names:
-​    kind: TLSOption
-​    plural: tlsoptions
-​    singular: tlsoption
-  scope: Namespaced
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: traefikservices.traefik.containo.us
-spec:
-  group: traefik.containo.us
-  version: v1alpha1
-  names:
-​    kind: TraefikService
-​    plural: traefikservices
-​    singular: traefikservice
-  scope: Namespaced
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: traefik-ingress-controller
-rules:
-  - apiGroups:
-​      - &quot;&quot;
-​    resources:
-​      - services
-​      - endpoints
-​      - secrets
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - extensions
-​    resources:
-​      - ingresses
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - extensions
-​    resources:
-​      - ingresses/status
-​    verbs:
-​      - update
-  - apiGroups:
-​      - traefik.containo.us
-​    resources:
-​      - middlewares
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - traefik.containo.us
-​    resources:
-​      - ingressroutes
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - traefik.containo.us
-​    resources:
-​      - ingressroutetcps
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - traefik.containo.us
-​    resources:
-​      - tlsoptions
-​    verbs:
-​      - get
-​      - list
-​      - watch
-  - apiGroups:
-​      - traefik.containo.us
-​    resources:
-​      - traefikservices
-​    verbs:
-​      - get
-​      - list
-​      - watch
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: traefik-ingress-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: traefik-ingress-controller
-subjects:
-  - kind: ServiceAccount
-​    name: traefik-ingress-controller
-​    namespace: default
+<pre><code>kubectl apply -f https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-crd.yaml
 </code></pre>
 <h3 id="service">Service</h3>
-<p>参见：http://advgitlab.eastasia.cloudapp.azure.com/WISE-PaaS-4.0-Ops/EnSaaS_DevOps_APIM/blob/master/example/traefik/traefik-service.yaml</p>
-<pre><code>apiVersion: v1
-kind: Service
-metadata:
-  name: traefik
-spec:
- type: LoadBalancer
-  ports:
-​    - protocol: TCP
-​      name: web
-​      port: 8000
-​    - protocol: TCP
-​      name: admin
-​      port: 8080
-​    - protocol: TCP
-​      name: websecure
-​      port: 4443
-​    - protocol: TCP
-​      name: prometheus
-​      port: 8082
-  selector:
-​    app: traefik
+<p>参见：https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-service.yaml</p>
+<pre><code>kubectl apply -f https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-crd.yaml
 </code></pre>
 <p>部署完成traefik的EXTERNAL-IP为<a href="http://172.21.92.148:8080/dashboard/#/">172.21.92.146</a></p>
 <h3 id="deployments">Deployments</h3>
-<p>参见：http://advgitlab.eastasia.cloudapp.azure.com/WISE-PaaS-4.0-Ops/EnSaaS_DevOps_APIM/blob/master/example/traefik/traefik-deployment.yaml</p>
+<p>参见：https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-deployment.yaml</p>
+<pre><code>kubectl apply -f https://github.com/HefeiJoe/traefik-k8s/blob/master/traefik-deployment.yaml
+</code></pre>
 <pre><code>apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -258,8 +95,6 @@ spec:
 ​      - --metrics.prometheus=true
 ​      - --entryPoints.metrics.address=:8082
 ​      - --metrics.prometheus.entryPoint=metrics
-​      *# Please note that this is the staging Let's Encrypt server.*
-​      *# Once you get things working, you should remove that whole line altogether.*
 ​      - --certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
 ​     ports:
 ​      - name: web
@@ -275,9 +110,320 @@ spec:
 <p>访问8080端口，<a href="http://172.21.92.148:8080/dashboard/#/">http://172.21.92.146:8080/dashboard/#/</a><br>
 可以查看开启的端口、添加的HTTP服务、添加的TCP服务、启用的Middleware、启用的Features、已经授信的功能。<br>
 <img src="https://uploader.shimo.im/f/9KL50flf9hg1UaL8.png!thumbnail" alt="img" loading="lazy"></p>
-<h2 id="helm-chart部署traefik">Helm Chart部署Traefik</h2>
+<h2 id="helm-chart">Helm Chart</h2>
 <p>Helm Chart地址：https://github.com/containous/traefik-helm-chart<br>
-helm install --namespace=default  ./traefik-helm-chart</p>
+helm install --namespace=default  ./traefik-helm-chart<br>
+#使用</p>
+<h3 id="部署whoami服务">部署whoami服务</h3>
+<p>部署测试服务whoami<br>
+参见：https://github.com/HefeiJoe/traefik-k8s/blob/master/whoami.yaml</p>
+<h2 id="ingress">Ingress</h2>
+<p>在traefik的Deployment中的arg下添加CLI<br>
+<em>- --providers.kubernetesingress=true</em><br>
+<em>- --providers.kubernetesingress.ingressclass=traefik</em><br>
+1、创建Ingress</p>
+<pre><code>kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  namespace: default
+ name: traefik-ingress
+ annotations:
+  *# use the shared ingress-nginx*
+  kubernetes.io/ingress.class: traefik
+</code></pre>
+<p>2、验证<br>
+访问服务curl -i 172.21.92.146:8000  -H &quot;Host:whoami.kong.test&quot;，接口响应200<br>
+<img src="https://uploader.shimo.im/f/ffocrRF3UjkXYBEb.png!thumbnail" alt="img" loading="lazy"></p>
+<h2 id="ingressroute">IngressRoute</h2>
+<pre><code>apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: simpleingressroute
+  namespace: default
+spec:
+  entryPoints:
+​    - web
+  routes:
+  - match: Host(`172.21.92.148`) &amp;&amp; PathPrefix(`/whoami`)
+​    kind: Rule
+​    services:
+​    - name: whoami
+​      port: 80
+</code></pre>
+<p>通过http://172.21.92.148:8000/whoami访问</p>
+<h2 id="middlewares中间件">Middlewares（中间件）</h2>
+<h3 id="overview概述">Overview（概述）</h3>
+<h3 id=""><img src="https://uploader.shimo.im/f/S1b2FXezLpQkSqx3.png!thumbnail" alt="img" loading="lazy"></h3>
+<p>将中间件添加到Route，在请求发送到服务之前(或在服务的响应发送到客户端之前)调整请求。<br>
+Traefik中有许多不同的中间件，有些可以修改请求、头文件，有些负责重定向，有些添加身份验证，等等。<br>
+<strong>给Route绑定Middleware</strong><br>
+在ingressRoute中添加middlewares<br>
+<em># As a Kubernetes Traefik IngressRoute</em></p>
+<pre><code>apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: stripprefix
+spec:
+  stripPrefix:
+​    prefixes:
+​      - /stripit
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: simpleingressroute
+  namespace: default
+spec:
+  entryPoints:
+​    - web
+  routes:
+  - match: Host(`172.21.92.148`) &amp;&amp; PathPrefix(`/whoami`)
+​    kind: Rule
+​    services:
+​    - name: whoami
+​      port: 80
+​    middlewares:
+- name: stripprefix
+</code></pre>
+<p>Available Middlewares<a href="https://docs.traefik.io/middlewares/overview/#available-middlewares">¶</a></p>
+<table>
+<thead>
+<tr>
+<th>Middleware</th>
+<th>Purpose</th>
+<th>Area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/addprefix/">AddPrefix</a></td>
+<td>Add a Path Prefix</td>
+<td>Path Modifier</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/basicauth/">BasicAuth</a></td>
+<td>Basic auth mechanism</td>
+<td>Security, Authentication</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/buffering/">Buffering</a></td>
+<td>Buffers the request/response</td>
+<td>Request Lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/chain/">Chain</a></td>
+<td>Combine multiple pieces of middleware</td>
+<td>Middleware tool</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/circuitbreaker/">CircuitBreaker</a></td>
+<td>Stop calling unhealthy services</td>
+<td>Request Lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/compress/">Compress</a></td>
+<td>Compress the response</td>
+<td>Content Modifier</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/digestauth/">DigestAuth</a></td>
+<td>Adds Digest Authentication</td>
+<td>Security, Authentication</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/errorpages/">Errors</a></td>
+<td>Define custom error pages</td>
+<td>Request Lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/forwardauth/">ForwardAuth</a></td>
+<td>Authentication delegation</td>
+<td>Security, Authentication</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/headers/">Headers</a></td>
+<td>Add / Update headers</td>
+<td>Security</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/ipwhitelist/">IPWhiteList</a></td>
+<td>Limit the allowed client IPs</td>
+<td>Security, Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/inflightreq/">InFlightReq</a></td>
+<td>Limit the number of simultaneous connections</td>
+<td>Security, Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/passtlsclientcert/">PassTLSClientCert</a></td>
+<td>Adding Client Certificates in a Header</td>
+<td>Security</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/ratelimit/">RateLimit</a></td>
+<td>Limit the call frequency</td>
+<td>Security, Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/redirectscheme/">RedirectScheme</a></td>
+<td>Redirect easily the client elsewhere</td>
+<td>Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/redirectregex/">RedirectRegex</a></td>
+<td>Redirect the client elsewhere</td>
+<td>Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/replacepath/">ReplacePath</a></td>
+<td>Change the path of the request</td>
+<td>Path Modifier</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/replacepathregex/">ReplacePathRegex</a></td>
+<td>Change the path of the request</td>
+<td>Path Modifier</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/retry/">Retry</a></td>
+<td>Automatically retry the request in case of errors</td>
+<td>Request lifecycle</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/stripprefix/">StripPrefix</a></td>
+<td>Change the path of the request</td>
+<td>Path Modifier</td>
+</tr>
+<tr>
+<td><a href="https://docs.traefik.io/middlewares/stripprefixregex/">StripPrefixRegex</a></td>
+<td>Change the path of the request</td>
+<td>Path Modifier</td>
+</tr>
+</tbody>
+</table>
+<h3 id="addprefix添加前缀">AddPrefix（添加前缀）</h3>
+<p><img src="https://uploader.shimo.im/f/1hy4I9o9piED68sO.png!thumbnail" alt="img" loading="lazy"><br>
+<em># Prefixing with /foo</em></p>
+<pre><code>apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: add-foo
+spec:
+  addPrefix:
+​    prefix: /foo
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>配置选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prefix</td>
+<td>prefix是添加在请求的URL路径之前的字符串。它应该包括前导斜杠(/)。参考<a href="https://docs.traefik.io/middlewares/addprefix/#prefix">¶</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="basicauth基本认证">BasicAuth（基本认证）</h3>
+<p><img src="https://uploader.shimo.im/f/IRa08Sg9kIIT5DuU.png!thumbnail" alt="img" loading="lazy"><br>
+<em># Declaring the user list</em></p>
+<pre><code>apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: test-auth
+spec:
+  basicAuth:
+​    secret: secretName
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>配置选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>secret</td>
+<td>绑定创建的secret。参考<a href="https://docs.traefik.io/middlewares/basicauth/#configuration-examples">¶</a></td>
+</tr>
+<tr>
+<td>users</td>
+<td>该users选项是一组授权用户。每个用户都将使用以下name:encoded-password格式声明。参考<a href="https://docs.traefik.io/middlewares/basicauth/#usersfile">¶</a></td>
+</tr>
+<tr>
+<td>usersFile</td>
+<td>该usersFile选项是包含中间件授权用户的外部文件的路径。参考<a href="https://docs.traefik.io/middlewares/basicauth/#realm">¶</a></td>
+</tr>
+<tr>
+<td>realm</td>
+<td>您可以使用realm选项来自定义身份验证领域。默认值为traefik。参考<a href="https://docs.traefik.io/middlewares/basicauth/#realm">¶</a></td>
+</tr>
+<tr>
+<td>headerField</td>
+<td>您可以使用该headerField选项定义标题字段以存储经过身份验证的用户。参考<a href="https://docs.traefik.io/middlewares/basicauth/#headerfield">¶</a></td>
+</tr>
+<tr>
+<td>removeHeader</td>
+<td>设置removeHeader选项以true在将请求转发到服务之前删除授权标头。（默认值为false。）参考<a href="https://docs.traefik.io/middlewares/basicauth/#removeheader">¶</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="circuitbreaker断路器">CircuitBreaker（断路器）</h3>
+<p><img src="https://uploader.shimo.im/f/Jf3qvl3fwsgp5pDV.png!thumbnail" alt="img" loading="lazy"><br>
+断路器可保护您的系统免于将请求堆叠到不正常的服务（导致级联故障）的麻烦。<br>
+系统运行状况良好时，电路处于闭合状态（正常运行）。当系统运行不正常时，电路将断开，并且不再转发请求（而是由后备机制处理）。<br>
+为了评估您的系统是否健康，断路器不断监视服务。<br>
+<em># Latency Check</em></p>
+<pre><code>apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: latency-check
+spec:
+  circuitBreaker:
+​    expression: LatencyAtQuantileMS(50.0) &gt; 100
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>配置选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NetworkErrorRatio</td>
+<td>如果您希望断路器以30％的网络错误率触发，则表达式为 NetworkErrorRatio() &gt; 0.30。参考<a href="https://docs.traefik.io/middlewares/addprefix/#prefix">¶</a></td>
+</tr>
+<tr>
+<td>ResponseCodeRatio</td>
+<td>您可以根据给定范围的状态码的比率来触发断路器。在ResponseCodeRatio接受四个参数，from，to，dividedByFrom，dividedByTo。例如，ResponseCodeRatio(500, 600, 0, 600) &gt; 0.25如果25％的请求返回5XX状态（在返回状态代码从0到5XX的请求中），则表达式将触发断路器。参考<a href="https://docs.traefik.io/middlewares/circuitbreaker/#responsecoderatio">¶</a></td>
+</tr>
+<tr>
+<td>LatencyAtQuantileMS</td>
+<td>当给定比例的请求变得太慢时，您可以触发断路器。例如，当中LatencyAtQuantileMS(50.0) &gt; 100值等待时间（分位数50）达到100MS时，该表达式将触发断路器。参考<a href="https://docs.traefik.io/middlewares/circuitbreaker/#latencyatquantilems">¶</a>您必须提供分位数的浮点数（后跟.0）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="metrics">Metrics</h2>
+<h3 id="prometheus">Prometheus</h3>
+<p>在traefik的Deployment中的arg下添加CLI（如果采用Helm Chart部署，在values.yaml的additionalArguments下添加以下CLI），并且修改Service暴露端口8082<br>
+<em>- --metrics.prometheus=true</em><br>
+<em>- --entryPoints.metrics.address=:8082</em><br>
+<em>- --metrics.prometheus.entryPoint=metrics</em><br>
+通过8082端口可以查看prometheus的metrics，<a href="http://172.21.92.148:8082/metrics">http://172.21.92.146:8082/metrics</a></p>
+<h2 id="tracing">Tracing</h2>
+<h3 id="zipkin">Zipkin</h3>
+<p>1、部署Zipkin<br>
+略<br>
+2、在traefik的Deployment中的arg下添加CLI（如果采用Helm Chart部署，在values.yaml的additionalArguments下添加以下CLI）<br>
+<em>- --tracing.zipkin=true</em><br>
+<em>- --tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans</em><br>
+<em>- --tracing.zipkin.sampleRate=1.0</em><br>
+访问zipkin的地址，http://localhost:9411/</p>
 ]]></content>
     </entry>
 </feed>
