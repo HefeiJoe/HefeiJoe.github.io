@@ -53,7 +53,7 @@
                                     <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2020-05-20 15:05:06">2020-05-20 / 10 min read</div>
                                     <div class="mdui-m-b-2 mdui-typo post-neirong"><h1 id="核心概念">核心概念😀</h1>
 <p>Traefik 是一个边缘路由器，是你整个平台的大门，拦截并路由每个传入的请求：它知道所有的逻辑和规则，这些规则确定哪些服务处理哪些请求；传统的反向代理需要一个配置文件，其中包含路由到你服务的所有可能路由，而 Traefik 会实时检测服务并自动更新路由规则，可以自动服务发现。<br>
-<img src="https://uploader.shimo.im/f/iyHnEdPIrUQBxeSd.png!thumbnail" alt="img" loading="lazy"><br>
+<img src="https://docs.traefik.io/assets/img/traefik-architecture.png" alt="img" loading="lazy"><br>
 首先，当启动 Traefik 时，需要定义 entrypoints（入口点），然后，根据连接到这些 entrypoints 的路由来分析传入的请求，来查看他们是否与一组规则相匹配，如果匹配，则路由可能会将请求通过一系列中间件转换过后再转发到你的服务上去。在了解 Traefik 之前有几个核心概念我们必须要了解：</p>
 <ul>
 <li><strong>Providers</strong> 用来自动发现平台上的服务，可以是编排工具、容器引擎或者 key-value 存储等，比如 Docker、Kubernetes、File。</li>
@@ -73,8 +73,7 @@
 在 Traefik 中有三种方式定义静态配置：在配置文件中、在命令行参数中、通过环境变量传递<br>
 动态配置包含定义系统如何处理请求的所有配置内容，这些配置是可以改变的，而且是无缝热更新的，没有任何请求中断或连接损耗。<br>
 在Kubernetes集群下，采用Deployment的方式部署traefik，并且打开kubernetes ingress，以及prometheus metrics。<br>
-<em>注：默认安装在<strong>default</strong>下</em><br>
-<img src="https://uploader.shimo.im/f/Unab5H1mprceZQuX.png!thumbnail" alt="img" loading="lazy"></li>
+<em>注：默认安装在<strong>default</strong>下</em></li>
 </ul>
 <h3 id="crd与rbac">CRD与RBAC</h3>
 <p>首先，定义CRD包括IngressRoute和Middleware。并且通过RBAC授权资源。<br>
