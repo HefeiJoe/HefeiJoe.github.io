@@ -1,22 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://hefeijoe.github.io/</id>
-    <title>HefeiJoe Blog</title>
-    <updated>2020-05-20T08:54:24.013Z</updated>
-    <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://hefeijoe.github.io/"/>
-    <link rel="self" href="https://hefeijoe.github.io/atom.xml"/>
-    <subtitle>水滴石穿</subtitle>
-    <logo>https://hefeijoe.github.io/images/avatar.png</logo>
-    <icon>https://hefeijoe.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2020, HefeiJoe Blog</rights>
-    <entry>
-        <title type="html"><![CDATA[Traefik V2基于Kubernetes的安装与使用]]></title>
-        <id>https://hefeijoe.github.io/post/traefik-k8s-use/</id>
-        <link href="https://hefeijoe.github.io/post/traefik-k8s-use/">
-        </link>
-        <updated>2020-05-20T07:05:06.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="核心概念">核心概念😀</h1>
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+        <meta charset="utf-8">
+        <title>Traefik V2基于Kubernetes的安装与使用 | HefeiJoe Blog</title>
+        <link rel="stylesheet" href="https://hefeijoe.github.io//styles/main.css">
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1306644_jwtuc2zzbrd.css">
+        <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+         <script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
+         <script >hljs.initHighlightingOnLoad();</script>
+
+    </head>
+    <body>
+              <header class="header mdui-m-b-5">      
+            <div class="container  ">
+                <div class="index-title animated fadeInDown mdui-text-center mdui-text-color-white mdui-m-b-2" style="animation-delay: 0.2s"><a href="https://hefeijoe.github.io/">HefeiJoe Blog</a></div>
+                <div class="mdui-text-color-white animated fadeInDown mdui-text-center  mdui-m-b-3" style="animation-delay: 0.4s">水滴石穿</div>
+           
+            <nav id="nav" class="mdui-text-center animated fadeInDown" style="animation-delay: 0.6s">
+                   
+                            <li><a href="/">首页</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/archives">归档</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/tags">标签</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                  </nav>
+                </div>
+        </header>
+        <div class="mdui-container ">
+                <div class="mdui-row">
+                        <div class="mdui-col-md-8 mdui-col-offset-md-2 ">
+                                <article class="mdui-p-a-2 post animated fadeIn" style="animation-delay: 0.8s;animation-duration: 2s">
+                                    <div class="post-title  mdui-m-b-1">Traefik V2基于Kubernetes的安装与使用</div>
+                                    <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2020-05-20 15:05:06">2020-05-20 / 10 min read</div>
+                                    <div class="mdui-m-b-2 mdui-typo post-neirong"><h1 id="核心概念">核心概念😀</h1>
 <p>Traefik 是一个边缘路由器，是你整个平台的大门，拦截并路由每个传入的请求：它知道所有的逻辑和规则，这些规则确定哪些服务处理哪些请求；传统的反向代理需要一个配置文件，其中包含路由到你服务的所有可能路由，而 Traefik 会实时检测服务并自动更新路由规则，可以自动服务发现。<br>
 <img src="https://docs.traefik.io/assets/img/traefik-architecture.png" alt="img" loading="lazy"><br>
 首先，当启动 Traefik 时，需要定义 entrypoints（入口点），然后，根据连接到这些 entrypoints 的路由来分析传入的请求，来查看他们是否与一组规则相匹配，如果匹配，则路由可能会将请求通过一系列中间件转换过后再转发到你的服务上去。在了解 Traefik 之前有几个核心概念我们必须要了解：</p>
@@ -423,6 +458,89 @@ spec:
 <em>- --tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans</em><br>
 <em>- --tracing.zipkin.sampleRate=1.0</em><br>
 访问zipkin的地址，http://localhost:9411/</p>
-]]></content>
-    </entry>
-</feed>
+</div>
+                                    <div class="mdui-divider mdui-m-b-2"></div>
+                                    <div class="mdui-row-xs-2 post-fenye">
+                                       
+                                        <div class="mdui-col"> </div>
+                                        
+
+                                        
+                                        <div class="mdui-col"></div>
+                                       
+                                      </div>
+                                   
+                                    <div class="mdui-divider mdui-m-t-2 mdui-m-b-2"></div>
+                                    
+                                     <script src="https://hefeijoe.github.io//media/scripts/Valine.min.js"></script>
+ <div class="comment"></div>
+
+<script>
+      new Valine({
+            el: '.comment',
+
+
+
+            path: window.location.pathname,
+            pageSize: 30,
+            avatar:'mm', 
+       })
+    </script> 
+<script>
+    if(window.location.hash){
+        var checkExist = setInterval(function() {
+           if ($(window.location.hash).length) {
+              $('html, body').animate({scrollTop: $(window.location.hash).offset().top-90}, 1000);
+              clearInterval(checkExist);
+           }
+        }, 100);
+    }
+</script>
+                                </article>
+
+                                    
+                        </div>
+                      </div>
+    
+                
+
+              </div>
+                    <footer class="footer mdui-m-t-5 mdui-text-center">
+               <nav class="social-links">
+                      <ul>
+                      
+                      
+                           
+                      
+                           
+                      	
+                        <li class="social-link"><a href="https://github.com/HefeiJoe" target="_blank"><i class="iconfont icon-github"></i></a></li>
+                          
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      </ul>
+                    </nav>
+                    <div class="copyright">
+                      <p>Powered by <a href="https://github.com/HefeiJoe" target="_blank">GitHub</a> <br/> Theme <a href="https://github.com/alterfang/gridea-theme-song/" target="_blank"  title="宋"  >Song</a> by <a href="https://shanbu.fun/" target="_blank"  title="山卜方" >shanbufun</a> </p>
+                  </div>
+                  
+              </footer>
+    </body>
+</html>
