@@ -445,7 +445,7 @@ spec:
 </table>
 <h2 id="metrics">Metrics</h2>
 <h3 id="prometheus">Prometheus</h3>
-<p>在traefik的Deployment中的arg下添加CLI（如果采用Helm Chart部署，在values.yaml的additionalArguments下添加以下CLI），并且修改Service暴露端口8082<br>
+<p>在traefik的Deployment中的arg下添加CLI（如果采用HelmChart部署，在values.yaml的additionalArguments下添加以下CLI），并且修改Service暴露端口8082<br>
 <em>- --metrics.prometheus=true</em><br>
 <em>- --entryPoints.metrics.address=:8082</em><br>
 <em>- --metrics.prometheus.entryPoint=metrics</em><br>
@@ -454,7 +454,7 @@ spec:
 <h3 id="zipkin">Zipkin</h3>
 <p>1、部署Zipkin<br>
 略<br>
-2、在traefik的Deployment中的arg下添加CLI（如果采用Helm Chart部署，在values.yaml的additionalArguments下添加以下CLI）<br>
+2、在traefik的Deployment中的arg下添加CLI（如果采用HelmChart部署，在values.yaml的additionalArguments下添加以下CLI）<br>
 <em>- --tracing.zipkin=true</em><br>
 <em>- --tracing.zipkin.httpEndpoint=http://localhost:9411/api/v2/spans</em><br>
 <em>- --tracing.zipkin.sampleRate=1.0</em><br>
