@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+        <meta charset="utf-8">
+        <title>Java中的堆(heap)和栈(stack) | HefeiJoe Blog</title>
+        <link rel="stylesheet" href="https://hefeijoe.github.io//styles/main.css">
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1306644_jwtuc2zzbrd.css">
+        <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+         <script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
+         <script >hljs.initHighlightingOnLoad();</script>
+
+    </head>
+    <body>
+              <header class="header mdui-m-b-5">      
+            <div class="container  ">
+                <div class="index-title animated fadeInDown mdui-text-center mdui-text-color-white mdui-m-b-2" style="animation-delay: 0.2s"><a href="https://hefeijoe.github.io/">HefeiJoe Blog</a></div>
+                <div class="mdui-text-color-white animated fadeInDown mdui-text-center  mdui-m-b-3" style="animation-delay: 0.4s">水滴石穿</div>
+           
+            <nav id="nav" class="mdui-text-center animated fadeInDown" style="animation-delay: 0.6s">
+                   
+                            <li><a href="/">首页</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/archives">归档</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/tags">标签</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                  </nav>
+                </div>
+        </header>
+        <div class="mdui-container ">
+                <div class="mdui-row">
+                        <div class="mdui-col-md-8 mdui-col-offset-md-2 ">
+                                <article class="mdui-p-a-2 post animated fadeIn" style="animation-delay: 0.8s;animation-duration: 2s">
+                                    <div class="post-title  mdui-m-b-1">Java中的堆(heap)和栈(stack)</div>
+                                    <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2020-05-28 09:48:09">2020-05-28 / 4 min read</div>
+                                    <div class="mdui-m-b-2 mdui-typo post-neirong"><h1 id="栈stack">栈(stack)🤠</h1>
+<p>Java里面Stack有两种含义：</p>
+<h2 id="数据结构">数据结构</h2>
+<p>Stack,即java.util.Stack，是Vector的一个子类，它实现了一个标准的后进先出的栈。<br>
+Stack的特点为LIFO，即后进先出（Last in, first out）。</p>
+<pre><code>public class Stack01 {
+    public static void main(String[] args) {
+        Stack&lt;Integer&gt; stack = new Stack&lt;&gt;();
+        stack.push(1);//把元素压栈
+        stack.empty();//判断stack是否为空
+        stack.peek();//取栈顶元素但不弹出
+        stack.search(1);//返回对象在堆栈中的位置，以 1 为基数。沒有查到则返回-1。
+        stack.pop();//把栈顶的元素“弹出”
+    }
+}
+</code></pre>
+<p>一般与之比较的是队列Queue，队列是两个口，先进先出。</p>
+<h2 id="内存区域">内存区域😚</h2>
+<p>系统一般在内存中划分出两种不同的内存空间，一种是Stack(栈),一种是heap(堆)。<br>
+<img src="https://pic1.zhimg.com/80/v2-e83cdfa865e6fb71caf65d7803c081bc_720w.jpg" alt="stack" loading="lazy"></p>
+<h3 id="栈的组成">栈的组成</h3>
+<p>栈帧由三部分组成：<strong>局部变量区</strong>、<strong>操作数栈</strong>、<strong>帧数据区</strong>。局部变量区和操作数栈的大小要视对应的方法而定，他们是按字长计算的。但调用一个方法时，它从类型信息中得到此方法局部变量区和操作数栈大小，并据此分配栈内存，然后压入Java栈。</p>
+<h4 id="局部变量区">局部变量区</h4>
+<p><strong>局部变量区</strong>被组织为以一个字长为单位、从0开始计数的数组，类型为short、byte和char的值在存入数组前要被转换成int值，而long和double在数组中占据连续的两项，在访问局部变量中的long或double时，只需取出连续两项的第一项的索引值即可,如某个long值在局部变量区中占据的索引时3、4项，取值时，指令只需取索引为3的long值即可。</p>
+<pre><code>public static int runClassMethod(int i,long l,float f,double d,Object o,byte b) { 
+    return 0;   
+}
+public int runInstanceMethod(char c,double d,short s,boolean b) { 
+    return 0;   
+}
+</code></pre>
+<h4 id="操作数栈">操作数栈</h4>
+<p>和局部变量区一样，操作数栈也被组织成一个以字长为单位的数组。但和前者不同的是，它不是通过索引来访问的，而是通过入栈和出栈来访问的。可把操作数栈理解为存储计算时，临时数据的存储区域。<br>
+操作数栈其实就是个临时数据存储区域，它是通过入栈和出栈来进行操作的。</p>
+<h4 id="帧数据区">帧数据区</h4>
+<p>在前面就描述过：栈是由栈帧组成，每当线程调用一个java方法时，JVM就会在该线程对应的栈中压入一个帧，而帧是由局部变量区、操作数栈和帧数据区组成。</p>
+<ol>
+<li>只有在调用一个方法时，才为当前栈分配一个帧，然后将该帧压入栈;</li>
+<li>帧中存储了对应方法的局部数据，方法执行完，对应的帧则从栈中弹出，并把返回结果存储在调用方法的帧的操作数栈中。</li>
+</ol>
+<h1 id="堆">堆😵</h1>
+<p>堆中分配的是对象，也就是new出来的东西。<br>
+<img src="https://pic1.zhimg.com/80/v2-00dc88198eef4f42a3dd1e34ee5cd5f7_720w.jpg" alt="heap" loading="lazy"></p>
+<h1 id="内存分配举个栗子">内存分配（举个栗子）</h1>
+<pre><code>public void Method1()
+{
+    int i = 4;
+    int y = 2;
+    class1 cls1 = new class1();
+}
+</code></pre>
+<p>内存分配是这样的：<br>
+<img src="https://pic1.zhimg.com/80/1519fb641bdb1ee150fcfb621b0afdd8_720w.jpg" alt="img" loading="lazy"></p>
+<h1 id="堆和栈的区别">堆和栈的区别🤗</h1>
+<ul>
+<li>功能不同<br>
+栈内存用来存储局部变量和方法调用。<br>
+而堆内存用来存储Java中的对象。无论是成员变量，局部变量，还是类变量，它们指向的对象都存储在堆内存中。</li>
+<li>共享性不同<br>
+  栈内存是线程私有的。<br>
+  堆内存是所有线程共有的。</li>
+<li>异常错误不同<br>
+  如果栈内存或者堆内存不足都会抛出异常。<br>
+  栈空间不足：java.lang.StackOverFlowError。<br>
+  堆空间不足：java.lang.OutOfMemoryError。</li>
+<li>空间大小<br>
+  栈的空间大小远远小于堆的。</li>
+<li>结构<br>
+  stack是有结构的，每个区块按照一定次序存放，可以明确知道每个区块的大小；heap是没有结构的，数据可以任意存放。因此，stack的寻址速度要快于heap。</li>
+<li>存放规则<br>
+  数据存放的规则是：只要是局部的、占用空间确定的数据，一般都存放在stack里面，否则就放在heap里面。</li>
+</ul>
+</div>
+                                    <div class="mdui-divider mdui-m-b-2"></div>
+                                    <div class="mdui-row-xs-2 post-fenye">
+                                       
+                                        <div class="mdui-col"> </div>
+                                        
+
+                                        
+                                        <div class="mdui-col"><div class="mdui-text-right "><a href="https://hefeijoe.github.io/post/traefik-k8s-use/">Traefik V2基于Kubernetes的安装与使用</a></div> </div>
+                                       
+                                      </div>
+                                   
+                                    <div class="mdui-divider mdui-m-t-2 mdui-m-b-2"></div>
+                                    
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'c3b755731b93e141a8f3',
+    clientSecret: 'ff1597668ceb63c05bdc5617f1346b10febaadfb',
+    repo: 'HefeiJoe.github.io',
+    owner: 'HefeiJoe',
+    admin: ['HefeiJoe'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+          
+        
+                                     <script src="https://hefeijoe.github.io//media/scripts/Valine.min.js"></script>
+ <div class="comment"></div>
+
+<script>
+      new Valine({
+            el: '.comment',
+
+
+
+            path: window.location.pathname,
+            pageSize: 30,
+            avatar:'mm', 
+       })
+    </script> 
+<script>
+    if(window.location.hash){
+        var checkExist = setInterval(function() {
+           if ($(window.location.hash).length) {
+              $('html, body').animate({scrollTop: $(window.location.hash).offset().top-90}, 1000);
+              clearInterval(checkExist);
+           }
+        }, 100);
+    }
+</script>
+                                </article>
+
+                                    
+                        </div>
+                      </div>
+    
+                
+
+              </div>
+                    <footer class="footer mdui-m-t-5 mdui-text-center">
+               <nav class="social-links">
+                      <ul>
+                      
+                      
+                           
+                      
+                           
+                      	
+                        <li class="social-link"><a href="https://github.com/HefeiJoe" target="_blank"><i class="iconfont icon-github"></i></a></li>
+                          
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      </ul>
+                    </nav>
+                    <div class="copyright">
+                      <p>Powered by <a href="https://github.com/HefeiJoe" target="_blank">GitHub</a> <br/> Theme <a href="https://github.com/alterfang/gridea-theme-song/" target="_blank"  title="宋"  >Song</a> by <a href="https://shanbu.fun/" target="_blank"  title="山卜方" >shanbufun</a> </p>
+                  </div>
+                  
+              </footer>
+    </body>
+</html>
