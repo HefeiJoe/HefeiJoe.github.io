@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+        <meta charset="utf-8">
+        <title>单例模式的应用场景 | HefeiJoe Blog</title>
+        <link rel="stylesheet" href="https://hefeijoe.github.io//styles/main.css">
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1306644_jwtuc2zzbrd.css">
+        <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+         <script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
+         <script >hljs.initHighlightingOnLoad();</script>
+
+    </head>
+    <body>
+              <header class="header mdui-m-b-5">      
+            <div class="container  ">
+                <div class="index-title animated fadeInDown mdui-text-center mdui-text-color-white mdui-m-b-2" style="animation-delay: 0.2s"><a href="https://hefeijoe.github.io/">HefeiJoe Blog</a></div>
+                <div class="mdui-text-color-white animated fadeInDown mdui-text-center  mdui-m-b-3" style="animation-delay: 0.4s">水滴石穿</div>
+           
+            <nav id="nav" class="mdui-text-center animated fadeInDown" style="animation-delay: 0.6s">
+                   
+                            <li><a href="/">首页</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/archives">归档</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/tags">标签</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                  </nav>
+                </div>
+        </header>
+        <div class="mdui-container ">
+                <div class="mdui-row">
+                        <div class="mdui-col-md-8 mdui-col-offset-md-2 ">
+                                <article class="mdui-p-a-2 post animated fadeIn" style="animation-delay: 0.8s;animation-duration: 2s">
+                                    <div class="post-title  mdui-m-b-1">单例模式的应用场景</div>
+                                    <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2020-06-22 10:37:07">2020-06-22 / 11 min read</div>
+                                    <div class="mdui-m-b-2 mdui-typo post-neirong"><h2 id="定义">定义😀</h2>
+<p>单例模式是最简单的设计模式之一，属于创建型模式，它提供了一种创建对象的方式，确保只有单个对象被创建。<br>
+这个设计模式主要目的是想在整个系统中只能出现类的一个实例，即一个类只有一个对象。<br>
+单例模式能够实现懒加载，能够在使用实例的时候才去创建实例。开发工具类库中的很多工具类都应用了单例模式，比例线程池、缓存、日志对象等，它们都只需要创建一个对象。<br>
+如果创建多份实例，可能会带来不可预知的问题，比如资源的浪费、结果处理不一致等问题。单例模式的解决的痛点就是节约资源，节省时间从两个方面看。</p>
+<ol>
+<li>由于频繁使用的对象，可以省略创建对象所花费的时间，这对于那些重量级的对象而言，是很重要的.</li>
+<li>因为不需要频繁创建对象，我们的GC压力也减轻了，而在GC中会有STW(stop the world)，从这一方面也节约了GC的时间 单例模式的缺点：简单的单例模式设计开发都比较简单，但是复杂的单例模式需要考虑线程安全等并发问题，引入了部分复杂度。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>饿汉式</th>
+<th>线程安全</th>
+<th>并发性能好</th>
+<th>可以延迟加载</th>
+<th>序列化/反序列化安全</th>
+<th>能抵御反射攻击</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>饿汉式</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>懒汉式</td>
+<td>不加锁</td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+</tr>
+<tr>
+<td>加锁的</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>DCL</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>静态内部类</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>枚举</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+</tbody>
+</table>
+<h2 id="设计">设计😁</h2>
+<p>设计单例模式的时候一般需要考虑几种因素:</p>
+<ul>
+<li>线程安全</li>
+<li>延迟加载</li>
+<li>代码安全:如防止序列化攻击，防止反射攻击(防止反射进行私有方法调用)</li>
+<li>性能因素<br>
+饿汉，懒汉(线程安全，线程非安全)，双重检查(DCL)(重点),内部类，以及枚举(重点)。</li>
+</ul>
+<h2 id="实现">实现😘</h2>
+<h3 id="饿汉模式">饿汉模式</h3>
+<pre><code>/**
+ * 饿汉式单例
+ * 线程安全，但没有达到懒加载目的
+ */
+public class Singeleton{
+    private static final Singeleton instance = new Singeleton();
+    // 私有化构造函数
+    private Singeleton(){
+        // To Do
+    }
+    public static Singeleton getInstance(){
+        return instance;
+    }
+}
+</code></pre>
+<p><strong>instance什么时候被初始化？</strong></p>
+<p>Singleton类被加载的时候就会被初始化，java虚拟机规范虽然没有强制性约束在什么时候开始类加载过程，但是对于类的初始化，虚拟机规范则严格规定了有且只有四种情况必须立即对类进行初始化，遇到new、getStatic、putStatic或invokeStatic这4条字节码指令时，如果类没有进行过初始化，则需要先触发其初始化。<br>
+生成这4条指令最常见的java代码场景是：</p>
+<ul>
+<li>使用new关键字实例化对象-</li>
+<li>读取一个类的静态字段（被final修饰、已在编译期把结果放在常量池的静态字段除外）</li>
+<li>设置一个类的静态字段（被final修饰、已在编译期把结果放在常量池的静态字段除外）</li>
+<li>调用一个类的静态方法</li>
+</ul>
+<p><strong>class的生命周期?</strong><br>
+class的生命周期一般来说会经历加载、连接、初始化、使用、和卸载五个阶段<br>
+<strong>class的加载机制</strong><br>
+这里可以聊下classloader的双亲委派模型。</p>
+<h3 id="懒汉模式">懒汉模式</h3>
+<h4 id="懒汉模式不加锁">懒汉模式(不加锁)</h4>
+<pre><code>/**
+ * 懒汉式单例
+ * 适用于单线程环境（不推荐）
+ * 
+ * 多线程不安全
+ * 
+ * 此方式在单线程的时候工作正常，但在多线程的情况下就有问题了。
+ * 如果两个线程同时运行到判断instance是否为null的if语句，并且instance的确没有被创建时，
+ * 那么两个线程都会创建一个实例，此时类型Singleton就不再满足单例模式的要求了。
+ */
+public class Singeleton{
+    private static Singeleton instance = null;
+    private Singeleton(){}
+    public Singeleton getInstance(){
+        if(instance==null){
+            instance = new Singeleton();
+        }
+        return instance;
+    }
+}
+</code></pre>
+<h4 id="懒汉模式加锁">懒汉模式(加锁)</h4>
+<pre><code>/**
+ * 懒汉式单例
+ * 适用于多线程环境，但效率不高（不推荐）
+ * 
+ * 为了保证在多线程环境下我们还是只能得到该类的一个实例，
+ * 只需要在getInstanceB()方法加上同步关键字sychronized，就可以了。
+ * 但每次调用getInstanceB()方法时都被synchronized关键字锁住了，会引起线程阻塞，影响程序的性能。
+ */
+public class Singeleton {
+    private static Singeleton instance = null;
+    private Singeleton(){}
+    public static synchronized Singeleton getInstance(){
+        if(instance==null){
+            instance = new Singeleton();
+        }
+        return instance;
+    }
+    public static void main(String[] args) {
+        Singeleton singeleton = Singeleton.getInstance();
+        System.out.println(singeleton);
+    }
+}
+</code></pre>
+<h3 id="双重检查dcl">双重检查DCL</h3>
+<pre><code>/**
+ * 
+ * 双重检查加锁（推荐）
+ * 线程安全
+ * 
+ */
+/*
+public class Singeleton{
+    private static Singeleton instance;
+    private Singeleton(){}
+    public static Singeleton getInstance(){
+        // 先判断实例是否存在，若不存在再对类对象进行加锁处理
+        if(instance==null){
+            synchronized(Singeleton.class){
+                if(instance==null){
+                    instance = new Singeleton();
+                }
+            }
+        }
+        return instance;
+    }
+    public static void main(String[] args) {
+        Singeleton singeleton = Singeleton.getInstance();
+        System.out.println(singeleton);
+    }
+}
+</code></pre>
+<p>推荐理由：</p>
+<ul>
+<li>延迟初始化。和懒汉模式一致，只有在初次调用静态方法getSingleton，才会初始化signleton实例。</li>
+<li>性能优化。同步会造成性能下降，在同步前通过判读singleton是否初始化，减少不必要的同步开销。</li>
+<li>线程安全。同步创建Singleton对象，同时注意到静态变量singleton使用volatile修饰。</li>
+</ul>
+<p><strong>为什么要使用volatile修饰？</strong><br>
+虽然已经使用synchronized进行同步，但在第4步创建对象时，会有下面的伪代码：</p>
+<pre><code>memory=allocate(); //1：分配内存空间
+ctorInstance();   //2:初始化对象
+singleton=memory; //3:设置singleton指向刚排序的内存空间
+</code></pre>
+<p>复制代码当线程A在执行上面伪代码时，2和3可能会发生重排序，因为重排序并不影响运行结果，还可以提升性能，所以JVM是允许的。如果此时伪代码发生重排序，步骤变为1-&gt;3-&gt;2,线程A执行到第3步时，线程B调用getsingleton方法，在判断singleton==null时不为null，则返回singleton。但此时singleton并还没初始化完毕，线程B访问的将是个还没初始化完毕的对象。当声明对象的引用为volatile后，伪代码的2、3的重排序在多线程中将被禁止。<br>
+synchronized同步块里面能够保证只创建一个对象。但是通过在synchronized的外面增加一层判断，就可以在对象一经创建以后，不再进入synchronized同步块。这种方案不仅减小了锁的粒度，保证了线程安全，性能方面也得到了大幅提升。<br>
+同时这里要注意一定要说volatile，这个很关键，volatile一般用于多线程的可见性，但是这里是用来防止指令重排序的。<br>
+<strong>扩展:</strong><br>
+<strong>为什么需要volatile？volatile有什么用？</strong></p>
+<ol>
+<li>首先要回答可见性，这个是毋庸质疑的，然后可能又会考到java内存模型。</li>
+<li>防止指令重排序: 防止new Singleton时指令重排序导致其他线程获取到未初始化完的对象。instance = new Singleton()这句，这并非是一个原子操作，事实上在 JVM 中这句话大概做了下面 3 件事情。1.给 instance 分配内存2.调用 Singleton 的构造函数来初始化成员变量3.将instance对象指向分配的内存空间（执行完这步 instance 就为非 null 了）<br>
+但是在 JVM 的即时编译器中存在指令重排序的优化。也就是说上面的第二步和第三步的顺序是不能保证的，最终的执行顺序可能是 1-2-3 也可能是 1-3-2。如果是后者，则在 3 执行完毕、2 未执行之前，被线程二抢占了，这时 instance 已经是非 null 了（但却没有初始化），所以线程二会直接返回 instance，然后使用，然后报错。</li>
+<li>顺便也可以说下volatie原理用内存屏障</li>
+</ol>
+<p><strong>讲讲synchronized和volatile的区别</strong><br>
+这里可以从synchroized能保证原子性，volatile不能保证说起，以及讲下synchroized是重量级锁，甚至可以所以下他和Lock的区别等等。<br>
+<strong>线程安全一般怎么实现的?</strong></p>
+<p>互斥同步。如lock,synchroized<br>
+非阻塞同步。如cas。<br>
+不同步。如threadLocal,局部变量。</p>
+<h3 id="静态内部类">静态内部类</h3>
+<pre><code>/**
+ * 
+ * 静态内部类方式（推荐）
+ * 加载一个类时，其内部类不会同时被加载。一个类被加载，当且仅当其某个静态成员（静态域、构造器、静态方法等）被调用时发生。 由于在调用 StaticSingleton.getInstance() 的时候，才会对单例进行初始化，而且通过反射
+ * 是不能从外部类获取内部类的属性的；由于静态内部类的特性，只有在其被第一次引用的时候才会被加载，所以可以保证其线程安全性。
+ * 总结：
+ * 优势：兼顾了懒汉模式的内存优化（使用时才初始化）以及饿汉模式的安全性（不会被反射入侵）。
+ * 劣势：需要两个类去做到这一点，虽然不会创建静态内部类的对象，但是其 Class 对象还是会被创建，而且是属于永久带的对象。
+ * 
+ */
+/*
+public class Singeleton{
+    private static Singeleton instance = null;
+    private Singeleton(){}
+    public static Singeleton getInstance(){
+        if(instance==null){
+            instance = inner.singeleton;
+        }
+        return instance;
+    }
+
+    public void methodA() {
+        System.out.println(&quot;It's methodA&quot;);
+    }
+
+    public void methodB() {
+        System.out.println(&quot;It's methodB&quot;);
+    }
+    private static class inner{
+        private static final Singeleton singeleton = new Singeleton();
+    }
+    public static void main(String[] args) {
+        Singeleton singeleton = Singeleton.getInstance();
+        singeleton.methodA();
+        singeleton.methodB();
+    }
+}
+</code></pre>
+<p><strong>推荐理由：</strong></p>
+<ul>
+<li>实现代码简洁。和双重检查单例对比，静态内部类单例实现代码真的是太简洁，又清晰明了。</li>
+<li>延迟初始化。调用getSingleton才初始化Singleton对象。</li>
+<li>线程安全。JVM在执行类的初始化阶段，会获得一个可以同步多个线程对同一个类的初始化的锁。</li>
+</ul>
+<p><strong>如何实现线程安全？</strong><br>
+线程A和线程B同时试图获得Singleton对象的初始化锁，假设线程A获取到了，那么线程B一直等待初始化锁。线程A执行类初始化，就算双重检查模式中伪代码发生了重排序，也不会影响线程A的初始化结果。初始化完后，释放锁。线程B获得初始化锁，发现Singleton对象已经初始化完毕，释放锁，不进行初始化，获得Singleton对象。<br>
+在涉及到反射和序列化的单例中，建议使用下文的枚举类型模式。</p>
+<h3 id="枚举类">枚举类</h3>
+<pre><code>/**
+ * 
+ * 枚举
+ * 多线程安全
+ * 能自动避免序列化/反序列化攻击，以及反射攻击(枚举类不能通过反射生成)
+ */
+public class Singeleton{
+    private Singeleton(){}
+    /**
+     * 枚举类型是线程安全的，并且只会装载一次
+     */
+    private enum Single{
+        INSTANCE;
+        private final Singeleton instance;
+        Single(){
+            instance = new Singeleton();
+        }
+        private Singeleton getInstance(){
+            return instance;
+        }
+    }
+    public static Singeleton getInstance(){
+        return Single.INSTANCE.getInstance();
+    }
+}
+</code></pre>
+<p>通过枚举类，他能自动避免序列化/反序列化攻击，以及反射攻击(枚举类不能通过反射生成)。<br>
+参考文章：<br>
+<a href="https://juejin.im/post/5cf09270f265da1bd260d239">https://juejin.im/post/5cf09270f265da1bd260d239</a><br>
+<a href="https://juejin.im/post/5b50b0dd6fb9a04f932ff53f">https://juejin.im/post/5b50b0dd6fb9a04f932ff53f</a></p>
+</div>
+                                    <div class="mdui-divider mdui-m-b-2"></div>
+                                    <div class="mdui-row-xs-2 post-fenye">
+                                       
+                                        <div class="mdui-col"> </div>
+                                        
+
+                                        
+                                        <div class="mdui-col"><div class="mdui-text-right "><a href="https://hefeijoe.github.io/post/stackandheap/">Java中的堆(heap)和栈(stack)</a></div> </div>
+                                       
+                                      </div>
+                                   
+                                    <div class="mdui-divider mdui-m-t-2 mdui-m-b-2"></div>
+                                    
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'c3b755731b93e141a8f3',
+    clientSecret: 'ff1597668ceb63c05bdc5617f1346b10febaadfb',
+    repo: 'HefeiJoe.github.io',
+    owner: 'HefeiJoe',
+    admin: ['HefeiJoe'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+          
+        
+                                     <script src="https://hefeijoe.github.io//media/scripts/Valine.min.js"></script>
+ <div class="comment"></div>
+
+<script>
+      new Valine({
+            el: '.comment',
+
+
+
+            path: window.location.pathname,
+            pageSize: 30,
+            avatar:'mm', 
+       })
+    </script> 
+<script>
+    if(window.location.hash){
+        var checkExist = setInterval(function() {
+           if ($(window.location.hash).length) {
+              $('html, body').animate({scrollTop: $(window.location.hash).offset().top-90}, 1000);
+              clearInterval(checkExist);
+           }
+        }, 100);
+    }
+</script>
+                                </article>
+
+                                    
+                        </div>
+                      </div>
+    
+                
+
+              </div>
+                    <footer class="footer mdui-m-t-5 mdui-text-center">
+               <nav class="social-links">
+                      <ul>
+                      
+                      
+                           
+                      
+                           
+                      	
+                        <li class="social-link"><a href="https://github.com/HefeiJoe" target="_blank"><i class="iconfont icon-github"></i></a></li>
+                          
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      </ul>
+                    </nav>
+                    <div class="copyright">
+                      <p>Powered by <a href="https://github.com/HefeiJoe" target="_blank">GitHub</a> <br/> Theme <a href="https://github.com/alterfang/gridea-theme-song/" target="_blank"  title="宋"  >Song</a> by <a href="https://shanbu.fun/" target="_blank"  title="山卜方" >shanbufun</a> </p>
+                  </div>
+                  
+              </footer>
+    </body>
+</html>
